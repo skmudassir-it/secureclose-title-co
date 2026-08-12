@@ -45,14 +45,18 @@ function EmblaSlider<T>({
 
   useEffect(() => {
     if (!emblaApi) return;
-    setCount(emblaApi.scrollSnapList().length);
     const onSelect = () => setSelected(emblaApi.selectedScrollSnap());
+    const onReInit = () => {
+      setCount(emblaApi.scrollSnapList().length);
+      setSelected(emblaApi.selectedScrollSnap());
+    };
     emblaApi.on("select", onSelect);
-    emblaApi.on("reInit", onSelect);
-    onSelect();
+    emblaApi.on("reInit", onReInit);
+    const raf = requestAnimationFrame(onReInit);
     return () => {
+      cancelAnimationFrame(raf);
       emblaApi.off("select", onSelect);
-      emblaApi.off("reInit", onSelect);
+      emblaApi.off("reInit", onReInit);
     };
   }, [emblaApi]);
 
